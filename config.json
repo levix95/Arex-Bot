@@ -1,0 +1,24 @@
+# config.json oluştur
+CONFIG = {
+    "keys": {},
+    "blacklist": [],
+    "premium_users": []
+}
+
+# Key komutları tamamla
+@bot.command()
+async def key_ver(ctx, kullanici: discord.Member, sure: int):
+    key = f"AREX-{random.randint(100000,999999)}"
+    CONFIG["keys"][key] = {"user": kullanici.id, "expires": time.time() + sure*3600}
+    await ctx.send(f"✅ {kullanici.mention} için key: `{key}` ({sure} saat)")
+
+@bot.command()
+async def key_kullan(ctx, key: str):
+    if key in CONFIG["keys"]:
+        data = CONFIG["keys"][key]
+        if time.time() < data["expires"]:
+            CONFIG["premium_users"].append(ctx.author.id)
+            await ctx.send("✅ Premium aktif! Tüm limitler açıldı!")
+        else:
+            del CONFIG["keys"][key]
+            await ctx.send("❌ Key süresi dolmuş!")
